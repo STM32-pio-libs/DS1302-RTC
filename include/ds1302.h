@@ -21,6 +21,7 @@
 #define GET_BIT(value, bit) (((value) >> (bit)) & 0x01)
 
 typedef enum {AM, PM, NONE} MeridiemEnum;
+typedef enum {MON=1, TUE, WED, THU, FRI, SAT, SUN} DaysEnum;
 
 typedef struct{
     GPIO_TypeDef* port;
@@ -39,6 +40,7 @@ typedef struct{
     int date;
     int month;
     int year;
+    DaysEnum day;
 }DS1302_TimeRecord;
 
 typedef struct{
@@ -54,5 +56,9 @@ void ds1302_writeByte(DS1302_HandelTypeDef* handel, uint8_t data, uint8_t addres
 int ds1302_getSecond(DS1302_HandelTypeDef* handel);
 int ds1302_getMinute(DS1302_HandelTypeDef* handel);
 Hour ds1302_getHour(DS1302_HandelTypeDef* handel);
+int ds1302_getDate(DS1302_HandelTypeDef* handel);
+int ds1302_getMonth(DS1302_HandelTypeDef* handel);
+int ds1302_getYear(DS1302_HandelTypeDef* handel);
+DaysEnum ds1302_getDay(DS1302_HandelTypeDef* handel);
 
 #endif

@@ -150,3 +150,30 @@ Hour ds1302_getHour(DS1302_HandelTypeDef* handel){
 
     return hour_data;
 }
+
+int ds1302_getDate(DS1302_HandelTypeDef* handel){
+    uint8_t date_data = ds1302_readByte(handel, DS1302_DATE);
+    int date = date_data & 0b00001111;
+    int date10 = (date_data & 0b00110000) >> 4;
+    return date10*10 + date;
+}
+
+int ds1302_getMonth(DS1302_HandelTypeDef* handel){
+    uint8_t month_data = ds1302_readByte(handel, DS1302_MONTH);
+    int month = month_data & 0b00001111;
+    int month10 = (month_data & 0b00010000) >> 4;
+    return month10*10 + month;
+}
+
+int ds1302_getYear(DS1302_HandelTypeDef* handel){
+    uint8_t year_data = ds1302_readByte(handel, DS1302_YEAR);
+    int year = year_data & 0b00001111;
+    int year10 = (year_data & 0b11110000) >> 4;
+    return year10*10 + year;
+}
+
+DaysEnum ds1302_getDay(DS1302_HandelTypeDef* handel){
+    uint8_t day_data = ds1302_readByte(handel, DS1302_YEAR);
+    int day = day_data & 0b00000111;
+    return day;
+}
