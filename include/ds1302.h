@@ -20,11 +20,23 @@
 
 #define GET_BIT(value, bit) (((value) >> (bit)) & 0x01)
 
+typedef enum {AM, PM, NONE} MeridiemEnum;
+
 typedef struct{
     GPIO_TypeDef* port;
     uint16_t pin;
 }GpioPin;
 
+typedef struct{
+    int sec;
+    int min;
+    int hour;
+    MeridiemEnum meridiem;
+
+    int date;
+    int month;
+    int year;
+}DS1302_TimeRecord;
 
 typedef struct{
     GpioPin CE_Pin;
