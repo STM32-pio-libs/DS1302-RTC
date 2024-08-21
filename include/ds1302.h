@@ -19,5 +19,6 @@ typedef struct{
 
 void ds1302_init(DS1302_HandelTypeDef* handel);
 uint8_t ds1302_readByte(DS1302_HandelTypeDef* handel, uint8_t address);
+void ds1302_writeByte(DS1302_HandelTypeDef* handel, uint8_t data, uint8_t address);
 
 #endif
