@@ -28,11 +28,14 @@ typedef struct{
 }GpioPin;
 
 typedef struct{
-    int sec;
-    int min;
     int hour;
     MeridiemEnum meridiem;
+}Hour;
 
+typedef struct{
+    int sec;
+    int min;
+    Hour hour;
     int date;
     int month;
     int year;
@@ -48,5 +51,8 @@ typedef struct{
 void ds1302_init(DS1302_HandelTypeDef* handel);
 uint8_t ds1302_readByte(DS1302_HandelTypeDef* handel, uint8_t address);
 void ds1302_writeByte(DS1302_HandelTypeDef* handel, uint8_t data, uint8_t address);
+int ds1302_getSecond(DS1302_HandelTypeDef* handel);
+int ds1302_getMinute(DS1302_HandelTypeDef* handel);
+Hour ds1302_getHour(DS1302_HandelTypeDef* handel);
 
 #endif
