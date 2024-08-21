@@ -2,6 +2,8 @@
 #define _DS1302_H
 #include "main.h"
 
+#define GET_BIT(value, bit) (((value) >> (bit)) & 0x01)
+
 typedef struct{
     GPIO_TypeDef* port;
     uint16_t pin;
@@ -16,5 +18,6 @@ typedef struct{
 
 
 void ds1302_init(DS1302_HandelTypeDef* handel);
+uint8_t ds1302_readByte(DS1302_HandelTypeDef* handel, uint8_t address);
 
 #endif
