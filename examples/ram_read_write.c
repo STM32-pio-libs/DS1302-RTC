@@ -30,8 +30,8 @@ int main(void){
 
         // read and write a single byte from an address
         uint8_t address = 20;
-        ds1302_writeRam(&rtc, address, 0xC);
-        printf("Data at Ram Address %d: %x\n", address, ds1302_readRam(&rtc, address));
+        ds1302_writeByteRam(&rtc, address, 0xC);
+        printf("Data at Ram Address %d: %x\n", address, ds1302_readByteRam(&rtc, address));
 
         HAL_Delay(1000);
     }

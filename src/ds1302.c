@@ -5,6 +5,7 @@
 
 #define DECTOBCD(value) ((value/10) << 4) | (value % 10)
 #define BCDTODEC(value) (((value&0b11110000)>>4)*10 + (value & 0b00001111))
+#define GET_BIT(value, bit) (((value) >> (bit)) & 0x01)
 
 static void DelayUs(uint32_t us) {
    for (uint32_t i = 0; i < us * (HAL_RCC_GetHCLKFreq() / 10000000) / 3; i++);
@@ -363,11 +364,11 @@ void ds1302_set24HourMode(DS1302_HandelTypeDef* handel){
 }
 
 
-void ds1302_writeRam(DS1302_HandelTypeDef* handel, uint8_t address, uint8_t data){
+void ds1302_writeByteRam(DS1302_HandelTypeDef* handel, uint8_t address, uint8_t data){
     ds1302_writeByte(handel, data, address | 0b11000000);
 }
 
-uint8_t ds1302_readRam(DS1302_HandelTypeDef* handel, uint8_t address){
+uint8_t ds1302_readByteRam(DS1302_HandelTypeDef* handel, uint8_t address){
     return ds1302_readByte(handel, address | 0b11000000);
 }
 
