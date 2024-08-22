@@ -139,7 +139,7 @@ Hour ds1302_getHour(DS1302_HandelTypeDef* handel){
     int hour = hour_data_raw & 0b00001111;
 
     if((hour_data_raw & 0b10000000) >> 7){
-        hour_data.meridiem = ((hour_data_raw & 0b00010000) >> 5) ? PM : AM;
+        hour_data.meridiem = ((hour_data_raw & 0b00100000) >> 5) ? PM : AM;
         int hour10 = (hour_data_raw & 0b00010000) >> 4;
         hour_data.hour = hour10*10 + hour;
     }
@@ -179,6 +179,37 @@ DaysEnum ds1302_getDay(DS1302_HandelTypeDef* handel){
     return day;
 }
 
+bool ds1302_setSecond(DS1302_HandelTypeDef* handel, uint8_t sec){
+    if(sec > 59) return false;
+    int sec1 = sec % 10;
+    int sec10 = sec / 10;
+    uint8_t sec_data = (sec10 << 4) | sec1;
+    ds1302_writeByte(handel, sec_data, DS1302_SECONDS);
+    return true;
+}
+
+bool ds1302_setMinute(DS1302_HandelTypeDef* handel, uint8_t min){
+    if(min > 59) return false;
+    int min1 = min % 10;
+    int min10 = min / 10;
+    uint8_t min_data = (min10 << 4) | min1;
+    ds1302_writeByte(handel, min_data, DS1302_MINUTES);
+    return true;
+}
+
+bool ds1302_setHour(DS1302_HandelTypeDef* handel, Hour hour){
+    if(hour.meridiem == NONE && hour.hour > 23) return false;
+    if(hour.meridiem != NONE && hour.hour > 12) return false;
+    int hour1 = hour.hour % 10;
+    int hour10 = hour.hour / 10;
+    uint8_t hour_data = (hour10 << 4) | hour1;
+    if(hour.meridiem != NONE){
+        hour_data |= 0b10000000;
+        if(hour.meridiem == PM) hour_data |= 0b00100000;
+    }
+    ds1302_writeByte(handel, hour_data, DS1302_HOURS);
+    return true;
+}
 
 bool ds1302_setDate(DS1302_HandelTypeDef* handel, uint8_t date){
     if(date > 31) return false;
