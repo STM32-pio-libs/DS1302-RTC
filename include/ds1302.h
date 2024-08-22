@@ -71,5 +71,5 @@ bool ds1302_setDay(DS1302_HandelTypeDef* handel, DaysEnum day);
 bool ds1302_setDateTime(DS1302_HandelTypeDef* handel, DS1302_TimeRecord datetime);
 void ds1302_getUpdateDateTime(DS1302_HandelTypeDef* handel, DS1302_TimeRecord* datetime);
 DS1302_TimeRecord ds1302_getDateTime(DS1302_HandelTypeDef* handel);
-
+void ds1302_burstRead(DS1302_HandelTypeDef* handel, uint8_t* buffer);
 #endif

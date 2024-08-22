@@ -234,18 +234,61 @@ bool ds1302_setDateTime(DS1302_HandelTypeDef* handel, DS1302_TimeRecord datetime
     return true;
 }
 
+
 void ds1302_getUpdateDateTime(DS1302_HandelTypeDef* handel, DS1302_TimeRecord* datetime){
-    datetime->sec = ds1302_getSecond(handel);
-    datetime->min = ds1302_getMinute(handel);
+    uint8_t buffer[8];
+    ds1302_burstRead(handel, buffer);
+    datetime->sec = BCDTODEC(buffer[0]);
+    datetime->min = BCDTODEC(buffer[1]);
     datetime->hour = ds1302_getHour(handel);
-    datetime->date = ds1302_getDate(handel);
-    datetime->month = ds1302_getMonth(handel);
-    datetime->year = ds1302_getYear(handel);
-    datetime->day = ds1302_getDay(handel);
+    datetime->date = BCDTODEC(buffer[3]);
+    datetime->month = BCDTODEC(buffer[4]);
+    datetime->day = BCDTODEC(buffer[5]);
+    datetime->year = BCDTODEC(buffer[6]);
 }
 
 DS1302_TimeRecord ds1302_getDateTime(DS1302_HandelTypeDef* handel){
     DS1302_TimeRecord datetime;
     ds1302_getUpdateDateTime(handel, &datetime);
     return datetime;
+}
+
+
+void ds1302_burstRead(DS1302_HandelTypeDef* handel, uint8_t* buffer){
+    uint8_t address = DS1302_CLOCK_BURST_READ | 0x01;
+    HAL_GPIO_WritePin(handel->CE_Pin.port, handel->CE_Pin.pin, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(handel->SCLK_Pin.port, handel->SCLK_Pin.pin, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(handel->IO_Pin.port, handel->IO_Pin.pin, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(handel->CE_Pin.port, handel->CE_Pin.pin, GPIO_PIN_SET);
+    
+    // Send the address
+    for(int i=0; i<8; i++){
+        HAL_GPIO_WritePin(handel->SCLK_Pin.port, handel->SCLK_Pin.pin, GPIO_PIN_RESET);
+        DelayUs(1);
+        HAL_GPIO_WritePin(handel->IO_Pin.port, handel->IO_Pin.pin, 
+                            GET_BIT(address, i) ? GPIO_PIN_SET : GPIO_PIN_RESET);
+        DelayUs(1);
+        HAL_GPIO_WritePin(handel->SCLK_Pin.port, handel->SCLK_Pin.pin, GPIO_PIN_SET);
+        DelayUs(1);
+    }
+
+    ds1302_enableReadMode(handel);
+
+    for(int j=0; j<8; j++){
+        buffer[j] = 0;
+        for(int i=0; i<8; i++){
+            HAL_GPIO_WritePin(handel->SCLK_Pin.port, handel->SCLK_Pin.pin, GPIO_PIN_RESET);
+            DelayUs(1);
+            if(HAL_GPIO_ReadPin(handel->IO_Pin.port, handel->IO_Pin.pin) == GPIO_PIN_SET){
+                buffer[j] |= (1 << i);
+            }
+            DelayUs(1);
+            HAL_GPIO_WritePin(handel->SCLK_Pin.port, handel->SCLK_Pin.pin, GPIO_PIN_SET);
+            DelayUs(1);
+        }
+    }
+
+    HAL_GPIO_WritePin(handel->CE_Pin.port, handel->CE_Pin.pin, GPIO_PIN_RESET);
+    DelayUs(1);
+    ds1302_enableWriteMode(handel);
 }
