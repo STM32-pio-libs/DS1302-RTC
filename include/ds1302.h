@@ -71,12 +71,19 @@ bool ds1302_setDay(DS1302_HandelTypeDef* handel, DaysEnum day);
 bool ds1302_setDateTime(DS1302_HandelTypeDef* handel, DS1302_TimeRecord datetime);
 void ds1302_getUpdateDateTime(DS1302_HandelTypeDef* handel, DS1302_TimeRecord* datetime);
 DS1302_TimeRecord ds1302_getDateTime(DS1302_HandelTypeDef* handel);
-void ds1302_burstRead(DS1302_HandelTypeDef* handel, uint8_t* buffer);
+void ds1302_burstRead(DS1302_HandelTypeDef* handel, uint8_t* buffer, uint8_t size, bool ram);
+void ds1302_burstWrite(DS1302_HandelTypeDef* handel, uint8_t* buffer, uint8_t size, bool ram);
 
 void ds1302_setClockHalt(DS1302_HandelTypeDef* handel, bool halt);
 bool ds1302_isClockHalted(DS1302_HandelTypeDef* handel);
 
 void ds1302_set12HourMode(DS1302_HandelTypeDef* handel);
 void ds1302_set24HourMode(DS1302_HandelTypeDef* handel);
+
+void ds1302_writeRam(DS1302_HandelTypeDef* handel, uint8_t address, uint8_t data);
+uint8_t ds1302_readRam(DS1302_HandelTypeDef* handel, uint8_t address);
+
+void ds1302_burstWriteRam(DS1302_HandelTypeDef* handel, uint8_t* buffer, uint8_t size);
+void ds1302_burstReadRam(DS1302_HandelTypeDef* handel, uint8_t* buffer, uint8_t size);
 
 #endif

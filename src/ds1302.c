@@ -238,7 +238,7 @@ bool ds1302_setDateTime(DS1302_HandelTypeDef* handel, DS1302_TimeRecord datetime
 
 void ds1302_getUpdateDateTime(DS1302_HandelTypeDef* handel, DS1302_TimeRecord* datetime){
     uint8_t buffer[8];
-    ds1302_burstRead(handel, buffer);
+    ds1302_burstRead(handel, buffer, 8, false);
     buffer[0] &= 0b01111111;
     datetime->sec = BCDTODEC(buffer[0]);
     datetime->min = BCDTODEC(buffer[1]);
@@ -256,8 +256,8 @@ DS1302_TimeRecord ds1302_getDateTime(DS1302_HandelTypeDef* handel){
 }
 
 
-void ds1302_burstRead(DS1302_HandelTypeDef* handel, uint8_t* buffer){
-    uint8_t address = DS1302_CLOCK_BURST_READ | 0x01;
+void ds1302_burstRead(DS1302_HandelTypeDef* handel, uint8_t* buffer, uint8_t size, bool ram){
+    uint8_t address = (ram)?DS1302_RAM_BURST_READ:DS1302_CLOCK_BURST_READ | 0x01;
     HAL_GPIO_WritePin(handel->CE_Pin.port, handel->CE_Pin.pin, GPIO_PIN_RESET);
     HAL_GPIO_WritePin(handel->SCLK_Pin.port, handel->SCLK_Pin.pin, GPIO_PIN_RESET);
     HAL_GPIO_WritePin(handel->IO_Pin.port, handel->IO_Pin.pin, GPIO_PIN_SET);
@@ -276,7 +276,7 @@ void ds1302_burstRead(DS1302_HandelTypeDef* handel, uint8_t* buffer){
 
     ds1302_enableReadMode(handel);
 
-    for(int j=0; j<8; j++){
+    for(int j=0; j<size; j++){
         buffer[j] = 0;
         for(int i=0; i<8; i++){
             HAL_GPIO_WritePin(handel->SCLK_Pin.port, handel->SCLK_Pin.pin, GPIO_PIN_RESET);
@@ -295,6 +295,40 @@ void ds1302_burstRead(DS1302_HandelTypeDef* handel, uint8_t* buffer){
     ds1302_enableWriteMode(handel);
 }
 
+void ds1302_burstWrite(DS1302_HandelTypeDef* handel, uint8_t* buffer, uint8_t size, bool ram){
+    uint8_t address = (ram)?DS1302_RAM_BURST_WRITE:DS1302_CLOCK_BURST_WRITE;
+    HAL_GPIO_WritePin(handel->CE_Pin.port, handel->CE_Pin.pin, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(handel->SCLK_Pin.port, handel->SCLK_Pin.pin, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(handel->IO_Pin.port, handel->IO_Pin.pin, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(handel->CE_Pin.port, handel->CE_Pin.pin, GPIO_PIN_SET);
+    
+    // Send the address
+    for(int i=0; i<8; i++){
+        HAL_GPIO_WritePin(handel->SCLK_Pin.port, handel->SCLK_Pin.pin, GPIO_PIN_RESET);
+        DelayUs(1);
+        HAL_GPIO_WritePin(handel->IO_Pin.port, handel->IO_Pin.pin, 
+                            GET_BIT(address, i) ? GPIO_PIN_SET : GPIO_PIN_RESET);
+        DelayUs(1);
+        HAL_GPIO_WritePin(handel->SCLK_Pin.port, handel->SCLK_Pin.pin, GPIO_PIN_SET);
+        DelayUs(1);
+    }
+
+    // Send the data
+    for(uint8_t j=0; j<size; j++){
+        for(int i=0; i<8; i++){
+            HAL_GPIO_WritePin(handel->SCLK_Pin.port, handel->SCLK_Pin.pin, GPIO_PIN_RESET);
+            DelayUs(1);
+            HAL_GPIO_WritePin(handel->IO_Pin.port, handel->IO_Pin.pin, 
+                                GET_BIT(buffer[j], i) ? GPIO_PIN_SET : GPIO_PIN_RESET);
+            DelayUs(1);
+            HAL_GPIO_WritePin(handel->SCLK_Pin.port, handel->SCLK_Pin.pin, GPIO_PIN_SET);
+            DelayUs(1);
+        }
+    }
+
+    HAL_GPIO_WritePin(handel->CE_Pin.port, handel->CE_Pin.pin, GPIO_PIN_RESET);
+    DelayUs(1);
+}
 
 void ds1302_setClockHalt(DS1302_HandelTypeDef* handel, bool halt){
     uint8_t second = ds1302_readByte(handel, DS1302_SECONDS);
@@ -326,4 +360,23 @@ void ds1302_set24HourMode(DS1302_HandelTypeDef* handel){
     hour.hour = (hour.meridiem == AM && hour.hour == 12) ? 0 : hour.hour;
     hour.meridiem = NONE;
     ds1302_setHour(handel, hour);
+}
+
+
+void ds1302_writeRam(DS1302_HandelTypeDef* handel, uint8_t address, uint8_t data){
+    ds1302_writeByte(handel, data, address | 0b11000000);
+}
+
+uint8_t ds1302_readRam(DS1302_HandelTypeDef* handel, uint8_t address){
+    return ds1302_readByte(handel, address | 0b11000000);
+}
+
+void ds1302_burstWriteRam(DS1302_HandelTypeDef* handel, uint8_t* buffer, uint8_t size){
+    if(size > 31) return;
+    ds1302_burstWrite(handel, buffer, size, true);
+}
+
+void ds1302_burstReadRam(DS1302_HandelTypeDef* handel, uint8_t* buffer, uint8_t size){
+    if(size > 31) return;
+    ds1302_burstRead(handel, buffer, size, true);
 }
