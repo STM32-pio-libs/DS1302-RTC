@@ -1,6 +1,6 @@
 {
   "name": "RTC-DS1302 STM32",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Easy to use library to use DS1302 RTC module written for STM32CubeHAL",
   "keywords": "stm32, RTC, DS1302, ",
   "repository":
