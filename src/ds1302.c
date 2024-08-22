@@ -31,7 +31,7 @@ void ds1302_init(DS1302_HandelTypeDef* handel){
     HAL_GPIO_Init(handel->SCLK_Pin.port, &gpioinit);
 }
 
-void ds1302_enableWriteMode(DS1302_HandelTypeDef* handel){
+static void ds1302_enableWriteMode(DS1302_HandelTypeDef* handel){
     GPIO_InitTypeDef gpioinit = {
         .Pin = handel->IO_Pin.pin,
         .Mode = GPIO_MODE_OUTPUT_PP,
@@ -41,7 +41,7 @@ void ds1302_enableWriteMode(DS1302_HandelTypeDef* handel){
     HAL_GPIO_Init(handel->IO_Pin.port, &gpioinit);
 }
 
-void ds1302_enableReadMode(DS1302_HandelTypeDef* handel){
+static void ds1302_enableReadMode(DS1302_HandelTypeDef* handel){
     GPIO_InitTypeDef gpioinit = {
         .Pin = handel->IO_Pin.pin,
         .Mode = GPIO_MODE_INPUT,
@@ -221,4 +221,31 @@ bool ds1302_setDay(DS1302_HandelTypeDef* handel, DaysEnum day){
     if(day > 7) return false;
     ds1302_writeByte(handel, day, DS1302_DAY);
     return true;
+}
+
+bool ds1302_setDateTime(DS1302_HandelTypeDef* handel, DS1302_TimeRecord datetime){
+    if(!ds1302_setSecond(handel, datetime.sec)) return false;
+    if(!ds1302_setMinute(handel, datetime.min)) return false;
+    if(!ds1302_setHour(handel, datetime.hour)) return false;
+    if(!ds1302_setDate(handel, datetime.date)) return false;
+    if(!ds1302_setMonth(handel, datetime.month)) return false;
+    if(!ds1302_setYear(handel, datetime.year)) return false;
+    if(!ds1302_setDay(handel, datetime.day)) return false;
+    return true;
+}
+
+void ds1302_getUpdateDateTime(DS1302_HandelTypeDef* handel, DS1302_TimeRecord* datetime){
+    datetime->sec = ds1302_getSecond(handel);
+    datetime->min = ds1302_getMinute(handel);
+    datetime->hour = ds1302_getHour(handel);
+    datetime->date = ds1302_getDate(handel);
+    datetime->month = ds1302_getMonth(handel);
+    datetime->year = ds1302_getYear(handel);
+    datetime->day = ds1302_getDay(handel);
+}
+
+DS1302_TimeRecord ds1302_getDateTime(DS1302_HandelTypeDef* handel){
+    DS1302_TimeRecord datetime;
+    ds1302_getUpdateDateTime(handel, &datetime);
+    return datetime;
 }
