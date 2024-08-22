@@ -76,4 +76,7 @@ void ds1302_burstRead(DS1302_HandelTypeDef* handel, uint8_t* buffer);
 void ds1302_setClockHalt(DS1302_HandelTypeDef* handel, bool halt);
 bool ds1302_isClockHalted(DS1302_HandelTypeDef* handel);
 
+void ds1302_set12HourMode(DS1302_HandelTypeDef* handel);
+void ds1302_set24HourMode(DS1302_HandelTypeDef* handel);
+
 #endif

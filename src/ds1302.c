@@ -310,3 +310,20 @@ bool ds1302_isClockHalted(DS1302_HandelTypeDef* handel){
     uint8_t second = ds1302_readByte(handel, DS1302_SECONDS);
     return second >> 7; 
 }
+
+void ds1302_set12HourMode(DS1302_HandelTypeDef* handel){
+    Hour hour = ds1302_getHour(handel);
+    if(hour.meridiem != NONE) return;
+    hour.meridiem = (hour.hour >= 12) ? PM : AM;
+    hour.hour = (hour.hour % 12 == 0) ? 12 : hour.hour % 12;;
+    ds1302_setHour(handel, hour);
+}
+
+void ds1302_set24HourMode(DS1302_HandelTypeDef* handel){
+    Hour hour = ds1302_getHour(handel);
+    if(hour.meridiem == NONE) return;
+    hour.hour += (hour.meridiem == PM && hour.hour != 12) ? 12 : 0;
+    hour.hour = (hour.meridiem == AM && hour.hour == 12) ? 0 : hour.hour;
+    hour.meridiem = NONE;
+    ds1302_setHour(handel, hour);
+}
