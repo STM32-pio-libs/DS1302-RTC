@@ -124,6 +124,7 @@ void ds1302_writeByte(DS1302_HandelTypeDef* handel, uint8_t data, uint8_t addres
 
 int ds1302_getSecond(DS1302_HandelTypeDef* handel){
     uint8_t sec_byte = ds1302_readByte(handel, DS1302_SECONDS);
+    sec_byte &= 0b01111111;
     return BCDTODEC(sec_byte);
 }
 
@@ -238,6 +239,7 @@ bool ds1302_setDateTime(DS1302_HandelTypeDef* handel, DS1302_TimeRecord datetime
 void ds1302_getUpdateDateTime(DS1302_HandelTypeDef* handel, DS1302_TimeRecord* datetime){
     uint8_t buffer[8];
     ds1302_burstRead(handel, buffer);
+    buffer[0] &= 0b01111111;
     datetime->sec = BCDTODEC(buffer[0]);
     datetime->min = BCDTODEC(buffer[1]);
     datetime->hour = ds1302_getHour(handel);
@@ -291,4 +293,20 @@ void ds1302_burstRead(DS1302_HandelTypeDef* handel, uint8_t* buffer){
     HAL_GPIO_WritePin(handel->CE_Pin.port, handel->CE_Pin.pin, GPIO_PIN_RESET);
     DelayUs(1);
     ds1302_enableWriteMode(handel);
+}
+
+
+void ds1302_setClockHalt(DS1302_HandelTypeDef* handel, bool halt){
+    uint8_t second = ds1302_readByte(handel, DS1302_SECONDS);
+    if (halt) {
+        second |= 0b10000000;
+    } else {
+        second &= 0b01111111;
+    }
+    ds1302_writeByte(handel, second, DS1302_SECONDS);
+}
+
+bool ds1302_isClockHalted(DS1302_HandelTypeDef* handel){
+    uint8_t second = ds1302_readByte(handel, DS1302_SECONDS);
+    return second >> 7; 
 }
