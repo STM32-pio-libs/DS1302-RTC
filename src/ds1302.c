@@ -1,6 +1,7 @@
 #include "main.h"
 #include "ds1302.h"
 #include <stdio.h>
+#include <stdbool.h>
 
 static void DelayUs(uint32_t us) {
    for (uint32_t i = 0; i < us * (HAL_RCC_GetHCLKFreq() / 10000000) / 3; i++);
@@ -173,7 +174,40 @@ int ds1302_getYear(DS1302_HandelTypeDef* handel){
 }
 
 DaysEnum ds1302_getDay(DS1302_HandelTypeDef* handel){
-    uint8_t day_data = ds1302_readByte(handel, DS1302_YEAR);
+    uint8_t day_data = ds1302_readByte(handel, DS1302_DAY);
     int day = day_data & 0b00000111;
     return day;
+}
+
+
+bool ds1302_setDate(DS1302_HandelTypeDef* handel, uint8_t date){
+    if(date > 31) return false;
+    int date1 = date % 10;
+    int date10 = date / 10;
+    uint8_t date_data = (date10 << 4) | date1;
+    ds1302_writeByte(handel, date_data, DS1302_DATE);
+    return true;
+}
+
+bool ds1302_setMonth(DS1302_HandelTypeDef* handel, uint8_t month){
+    if(month > 12) return false;
+    int month1 = month % 10;
+    int month10 = month / 10;
+    uint8_t month_data = (month10 << 4) | month1;
+    ds1302_writeByte(handel, month_data, DS1302_MONTH);
+    return true;
+}
+
+bool ds1302_setYear(DS1302_HandelTypeDef* handel, uint8_t year){
+    if(year > 99) return false;
+    int year1 = year % 10;
+    int year10 = year / 10;
+    uint8_t year_data = (year10 << 4) | year1;
+    ds1302_writeByte(handel, year_data, DS1302_YEAR);
+    return true;
+}
+
+bool ds1302_setDay(DS1302_HandelTypeDef* handel, DaysEnum day){
+    ds1302_writeByte(handel, day, DS1302_DAY);
+    return true;
 }

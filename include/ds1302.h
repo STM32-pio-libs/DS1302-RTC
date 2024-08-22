@@ -1,6 +1,7 @@
 #ifndef _DS1302_H
 #define _DS1302_H
 #include "main.h"
+#include <stdbool.h>
 
 #define DS1302_SECONDS           0x80
 #define DS1302_MINUTES           0x82
@@ -60,5 +61,9 @@ int ds1302_getDate(DS1302_HandelTypeDef* handel);
 int ds1302_getMonth(DS1302_HandelTypeDef* handel);
 int ds1302_getYear(DS1302_HandelTypeDef* handel);
 DaysEnum ds1302_getDay(DS1302_HandelTypeDef* handel);
+bool ds1302_setDate(DS1302_HandelTypeDef* handel, uint8_t date);
+bool ds1302_setMonth(DS1302_HandelTypeDef* handel, uint8_t month);
+bool ds1302_setYear(DS1302_HandelTypeDef* handel, uint8_t year);
+bool ds1302_setDay(DS1302_HandelTypeDef* handel, DaysEnum day);
 
 #endif
