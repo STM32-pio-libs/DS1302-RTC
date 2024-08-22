@@ -1,0 +1,26 @@
+{
+  "name": "RTC-DS1302 STM32",
+  "version": "1.0.0",
+  "description": "Easy to use library to use DS1302 RTC module written for STM32CubeHAL",
+  "keywords": "stm32, RTC, DS1302, ",
+  "repository":
+  {
+    "type": "git",
+    "url": "https://github.com/STM32-pio-libs/DS1302-RTC"
+  },
+  "authors":
+  [
+    {
+      "name": "Anurag Kumar Singh",
+      "email": "anurag3301.0x0@gmail.com",
+      "url": "https://github.com/anurag3301",
+      "maintainer": true
+    }
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/STM32-pio-libs",
+  "dependencies": {
+  },
+  "frameworks": "stm32cube",
+  "platforms": "ststm32"
+}
