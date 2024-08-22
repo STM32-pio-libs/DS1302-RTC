@@ -1,6 +1,7 @@
 # DS1302-RTC
 
 This is a simple-to-use library to interface with the DS1302 RTC module written for STM32CubeHal.
+
 <img src="https://github.com/user-attachments/assets/291db377-a329-4ae4-878a-7e571ff7136b" width="200">
 
 ### Features
